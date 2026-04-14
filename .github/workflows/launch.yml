@@ -1,16 +1,16 @@
 name: Oracle ARM Auto Launcher
 
 on:
-  workflow_dispatch: # 產生手動執行按鈕
+  workflow_dispatch:
   schedule:
-    - cron: '*/5 * * * *' # 建議改為每 5 分鐘一次，1 分鐘太頻繁可能會被 GitHub 暫停腳本
+    - cron: '*/5 * * * *'
 
 jobs:
   launch:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4 # 更新到 v4 避開之前的警告
+        uses: actions/checkout@v4
 
       - name: Install PHP
         uses: shivammathur/setup-php@v2
@@ -40,4 +40,5 @@ jobs:
           OCI_MEMORY_IN_GBS: ${{ secrets.OCI_MEMORY_IN_GBS }}
           OCI_SHAPE: ${{ secrets.OCI_SHAPE }}
           OCI_MAX_INSTANCES: 1
-          # OCI_SSH_PUBLIC_KEY: ${{ secrets.OCI_SSH_PUBLIC_KEY }} # <--- 先註解這一行，排除 SSH Key 格式錯誤的可能性
+          # 這裡我們給它一對引號 ""，確保它是一串空字串，才不會導致 PHP 報錯
+          OCI_SSH_PUBLIC_KEY: "${{ secrets.OCI_SSH_PUBLIC_KEY || '' }}"
