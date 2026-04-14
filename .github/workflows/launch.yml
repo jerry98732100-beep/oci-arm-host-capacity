@@ -1,9 +1,9 @@
 name: Oracle ARM Auto Launcher
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # 手動觸發按鈕
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '*/5 * * * *' # 每 5 分鐘執行一次的計時器
 
 jobs:
   launch:
