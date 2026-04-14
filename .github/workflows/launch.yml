@@ -10,13 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4 # 升級到 v4
+        uses: actions/checkout@v4
 
       - name: Install PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          # 注意：這裡如果原本有用到 cache，setup-php v2 會自動處理，不需要額外的 actions/cache@v2
 
       - name: Install Dependencies
         run: composer update --prefer-dist --no-progress
@@ -41,4 +40,5 @@ jobs:
           OCI_MEMORY_IN_GBS: ${{ secrets.OCI_MEMORY_IN_GBS }}
           OCI_SHAPE: ${{ secrets.OCI_SHAPE }}
           OCI_MAX_INSTANCES: 1
-          OCI_SSH_PUBLIC_KEY: "${{ secrets.OCI_SSH_PUBLIC_KEY || '' }}"
+          # --- 強制清空 SSH Key，排除格式造成的 JSON 解析錯誤 ---
+          OCI_SSH_PUBLIC_KEY: ""
