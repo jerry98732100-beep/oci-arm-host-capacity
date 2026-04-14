@@ -25,6 +25,14 @@ jobs:
           echo "${{ secrets.OCI_PRIVATE_KEY }}" > private_key.pem
           chmod 600 private_key.pem
 
+      - name: Debug Parameters # 新增偵錯步驟
+        run: |
+          echo "Checking Parameter Formats (lengths):"
+          echo "Region: ${{ secrets.OCI_REGION }}"
+          echo "AD Name Length: $(echo -n "${{ secrets.OCI_AVAILABILITY_DOMAIN }}" | wc -c)"
+          echo "Subnet ID starts with: $(echo "${{ secrets.OCI_SUBNET_ID }}" | cut -c 1-20)..."
+          echo "Image ID starts with: $(echo "${{ secrets.OCI_IMAGE_ID }}" | cut -c 1-20)..."
+
       - name: Run Launcher
         run: php index.php
         env:
@@ -40,5 +48,4 @@ jobs:
           OCI_MEMORY_IN_GBS: ${{ secrets.OCI_MEMORY_IN_GBS }}
           OCI_SHAPE: ${{ secrets.OCI_SHAPE }}
           OCI_MAX_INSTANCES: 1
-          # 這裡我們給它一對引號 ""，確保它是一串空字串，才不會導致 PHP 報錯
-          OCI_SSH_PUBLIC_KEY: "${{ secrets.OCI_SSH_PUBLIC_KEY || '' }}"
+          OCI_SSH_PUBLIC_KEY: ""
