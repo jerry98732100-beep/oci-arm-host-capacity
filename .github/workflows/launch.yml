@@ -1,0 +1,43 @@
+name: Oracle ARM Auto Launcher
+
+on:
+  workflow_dispatch: # 產生手動執行按鈕
+  schedule:
+    - cron: '*/1 * * * *' # 每 5 分鐘自動執行一次
+
+jobs:
+  launch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+
+      - name: Install Dependencies
+        run: composer update --prefer-dist --no-progress
+
+      - name: Setup Private Key
+        run: |
+          echo "${{ secrets.OCI_PRIVATE_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
+
+      - name: Run Launcher
+        run: php index.php # 這是執行搶機的指令
+        env:
+          OCI_REGION: ${{ secrets.OCI_REGION }}
+          OCI_USER_ID: ${{ secrets.OCI_USER_ID }}
+          OCI_TENANCY_ID: ${{ secrets.OCI_TENANCY_ID }}
+          OCI_KEY_FINGERPRINT: ${{ secrets.OCI_KEY_FINGERPRINT }}
+          OCI_PRIVATE_KEY_FILENAME: "private_key.pem" # 告訴腳本金鑰檔案的位置
+          OCI_AVAILABILITY_DOMAIN: ${{ secrets.OCI_AVAILABILITY_DOMAIN }}
+          OCI_SUBNET_ID: ${{ secrets.OCI_SUBNET_ID }}
+          OCI_IMAGE_ID: ${{ secrets.OCI_IMAGE_ID }}
+          OCI_OCPUS: ${{ secrets.OCI_OCPUS }}
+          OCI_MEMORY_IN_GBS: ${{ secrets.OCI_MEMORY_IN_GBS }}
+          OCI_SHAPE: ${{ secrets.OCI_SHAPE }}
+          OCI_MAX_INSTANCES: 1
+          OCI_SSH_PUBLIC_KEY: ${{ secrets.OCI_SSH_PUBLIC_KEY }}
