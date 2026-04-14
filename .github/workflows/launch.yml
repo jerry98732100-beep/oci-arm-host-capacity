@@ -3,14 +3,14 @@ name: Oracle ARM Auto Launcher
 on:
   workflow_dispatch: # 產生手動執行按鈕
   schedule:
-    - cron: '*/1 * * * *' # 每 5 分鐘自動執行一次
+    - cron: '*/5 * * * *' # 建議改為每 5 分鐘一次，1 分鐘太頻繁可能會被 GitHub 暫停腳本
 
 jobs:
   launch:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4 # 更新到 v4 避開之前的警告
 
       - name: Install PHP
         uses: shivammathur/setup-php@v2
@@ -26,13 +26,13 @@ jobs:
           chmod 600 private_key.pem
 
       - name: Run Launcher
-        run: php index.php # 這是執行搶機的指令
+        run: php index.php
         env:
           OCI_REGION: ${{ secrets.OCI_REGION }}
           OCI_USER_ID: ${{ secrets.OCI_USER_ID }}
           OCI_TENANCY_ID: ${{ secrets.OCI_TENANCY_ID }}
           OCI_KEY_FINGERPRINT: ${{ secrets.OCI_KEY_FINGERPRINT }}
-          OCI_PRIVATE_KEY_FILENAME: "private_key.pem" # 告訴腳本金鑰檔案的位置
+          OCI_PRIVATE_KEY_FILENAME: "private_key.pem"
           OCI_AVAILABILITY_DOMAIN: ${{ secrets.OCI_AVAILABILITY_DOMAIN }}
           OCI_SUBNET_ID: ${{ secrets.OCI_SUBNET_ID }}
           OCI_IMAGE_ID: ${{ secrets.OCI_IMAGE_ID }}
@@ -40,4 +40,4 @@ jobs:
           OCI_MEMORY_IN_GBS: ${{ secrets.OCI_MEMORY_IN_GBS }}
           OCI_SHAPE: ${{ secrets.OCI_SHAPE }}
           OCI_MAX_INSTANCES: 1
-          OCI_SSH_PUBLIC_KEY: ${{ secrets.OCI_SSH_PUBLIC_KEY }}
+          # OCI_SSH_PUBLIC_KEY: ${{ secrets.OCI_SSH_PUBLIC_KEY }} # <--- 先註解這一行，排除 SSH Key 格式錯誤的可能性
