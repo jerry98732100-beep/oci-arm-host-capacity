@@ -1,9 +1,9 @@
-name: Oracle ARM Auto Launcher
+name: Oracle ARM Auto Launcher (Public Turbo)
 
 on:
-  workflow_dispatch: # 手動執行按鈕
+  workflow_dispatch:
   schedule:
-    - cron: '*/5 * * * *' # 自動排程：每 5 分鐘執行一次
+    - cron: '5 * * * *' # 每小時的第 5 分鐘自動啟動
 
 jobs:
   launch:
@@ -25,8 +25,16 @@ jobs:
           echo "${{ secrets.OCI_PRIVATE_KEY }}" > private_key.pem
           chmod 600 private_key.pem
 
-      - name: Run Launcher
-        run: php index.php
+      - name: Run Turbo Loop (5-min interval)
+        run: |
+          # 執行 11 次循環，每次間隔 300 秒，總長約 55 分鐘
+          for i in {1..11}
+          do
+            echo "Attempt #$i at $(date)"
+            php index.php
+            echo "Wait 300s..."
+            sleep 300
+          done
         env:
           OCI_REGION: ${{ secrets.OCI_REGION }}
           OCI_USER_ID: ${{ secrets.OCI_USER_ID }}
@@ -40,5 +48,4 @@ jobs:
           OCI_MEMORY_IN_GBS: ${{ secrets.OCI_MEMORY_IN_GBS }}
           OCI_SHAPE: ${{ secrets.OCI_SHAPE }}
           OCI_MAX_INSTANCES: 1
-          # --- 強制清空 SSH Key，排除格式造成的 JSON 解析錯誤 ---
-          OCI_SSH_PUBLIC_KEY: ""
+          OCI_SSH_PUBLIC_KEY: "" # 已確認暫時不填可避免格式錯誤
